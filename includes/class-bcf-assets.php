@@ -19,7 +19,7 @@ class BCF_Assets
 
      public function enqueue_admin_assets($hook)
      {
-          if (strpos($hook, 'bcf-form-builder') !== false || get_post_type() === 'bcf_submission') {
+          if (strpos($hook, 'bcf-dashboard') !== false || strpos($hook, 'bcf-form-builder') !== false || get_post_type() === 'bcf_submission') {
                wp_enqueue_style('bcf-admin', BCF_PLUGIN_URL . 'assets/css/admin.css', array(), '1.0.0');
           }
           if (strpos($hook, 'bcf-form-builder') !== false) {

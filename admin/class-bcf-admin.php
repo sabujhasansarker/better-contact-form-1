@@ -12,6 +12,14 @@ class BCF_Admin
      {
           add_submenu_page(
                'edit.php?post_type=bcf_submission',
+               'Dashboard',
+               'Dashboard',
+               'manage_options',
+               'bcf-dashboard',
+               array($this, 'dashboard_page')
+          );
+          add_submenu_page(
+               'edit.php?post_type=bcf_submission',
                'Form Builder',
                'Form Builder',
                'manage_options',
@@ -194,7 +202,7 @@ class BCF_Admin
                     }));
                });
           </script>
-<?php
+     <?php
      }
      public function save_form_builder()
      {
@@ -256,5 +264,69 @@ class BCF_Admin
                     'locked' => true
                ),
           );
+     }
+
+     public function dashboard_page()
+     {
+          $total_submissions = wp_count_posts('bcf_submission');
+          $recent_submissions = get_posts(array(
+               'post_type' => 'bcf_submission',
+               'posts_per_page' => 5,
+               'post_status' => 'publish'
+          ));
+     ?>
+          <div class="wrap">
+               <h1>Better Contact Form Dashboard</h1>
+
+               <div class="bcf-dashboard">
+                    <div class="bcf-stats">
+                         <div class="bcf-stat-card">
+                              <h3>Total Submissions</h3>
+                              <div class="bcf-stat-number"><?php echo $total_submissions->publish; ?></div>
+                         </div>
+                    </div>
+
+                    <div class="bcf-instructions">
+                         <h2>Usage Instructions</h2>
+                         <p>To display the contact form on any page or post, use the following shortcode:</p>
+                         <code>[better-contact-form]</code>
+
+                         <h3>Optional Parameters:</h3>
+                         <ul>
+                              <li><strong>title</strong> - Custom form title: <code>[better-contact-form title="Get in Touch"]</code></li>
+                         </ul>
+                    </div>
+
+                    <div class="bcf-recent">
+                         <h2>Recent Submissions</h2>
+                         <?php if ($recent_submissions): ?>
+                              <table class="wp-list-table widefat fixed striped">
+                                   <thead>
+                                        <tr>
+                                             <th>Date</th>
+                                             <th>Title</th>
+                                             <th>Action</th>
+                                        </tr>
+                                   </thead>
+                                   <tbody>
+                                        <?php foreach ($recent_submissions as $submission): ?>
+                                             <tr>
+                                                  <td><?php echo get_the_date('', $submission); ?></td>
+                                                  <td><?php echo esc_html($submission->post_title); ?></td>
+                                                  <td>
+                                                       <a href="<?php echo get_edit_post_link($submission->ID); ?>" class="button button-small">View</a>
+                                                  </td>
+                                             </tr>
+                                        <?php endforeach; ?>
+                                   </tbody>
+                              </table>
+                         <?php else: ?>
+                              <p>No submissions yet.</p>
+                         <?php endif; ?>
+                    </div>
+               </div>
+          </div>
+<?php
+
      }
 }
