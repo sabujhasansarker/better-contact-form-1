@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine.js Basics - Minimal Examples</title>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .example {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .example h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #005a87;
+        }
+
+        input,
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .list-item {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Alpine.js Basics - Minimal Examples</h1>
+
+    <!-- Example 1: Basic Reactivity -->
+    <div class="example" x-data="{ message: 'Hello Alpine!' }">
+        <h3>1. Basic Reactivity</h3>
+        <p x-text="message"></p>
+        <input type="text" x-model="message" placeholder="Type something...">
+    </div>
+
+    <!-- Example 2: Toggle Show/Hide -->
+    <div class="example" x-data="{ open: false }">
+        <h3>2. Toggle Show/Hide</h3>
+        <button @click="open = !open" x-text="open ? 'Hide' : 'Show'"></button>
+        <div x-show="open">
+            <p>This content can be toggled!</p>
+        </div>
+    </div>
+
+    <!-- Example 3: Counter -->
+    <div class="example" x-data="{ count: 0 }">
+        <h3>3. Simple Counter</h3>
+        <p>Count: <span x-text="count"></span></p>
+        <button @click="count++">+</button>
+        <button @click="count--">-</button>
+        <button @click="count = 0">Reset</button>
+    </div>
+
+    <!-- Example 4: Form Input -->
+    <div class="example" x-data="{ name: '', email: '' }">
+        <h3>4. Form Inputs</h3>
+        <input type="text" x-model="name" placeholder="Your name">
+        <input type="email" x-model="email" placeholder="Your email">
+        <div x-show="name || email">
+            <p><strong>Name:</strong> <span x-text="name || 'Not provided'"></span></p>
+            <p><strong>Email:</strong> <span x-text="email || 'Not provided'"></span></p>
+        </div>
+    </div>
+
+    <!-- Example 5: List with Loop -->
+    <div class="example" x-data="{ items: ['Apple', 'Banana', 'Orange'], newItem: '' }">
+        <h3>5. Dynamic List</h3>
+        <input type="text" x-model="newItem" placeholder="Add new item" @keyup.enter="items.push(newItem); newItem = ''">
+        <button @click="items.push(newItem); newItem = ''" x-show="newItem">Add Item</button>
+
+        <div>
+            <template x-for="(item, index) in items" :key="index">
+                <div class="list-item">
+                    <span x-text="item"></span>
+                    <button @click="items.splice(index, 1)" style="background: #dc3545; float: right;">Remove</button>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Example 6: Conditional Classes -->
+    <div class="example" x-data="{ active: false }">
+        <h3>6. Conditional Styling</h3>
+        <button @click="active = !active" :style="active ? 'background: green' : 'background: red'" x-text="active ? 'Active' : 'Inactive'">
+        </button>
+        <p :class="active ? 'color: green' : 'color: red'" x-text="'Status: ' + (active ? 'ON' : 'OFF')"></p>
+    </div>
+
+    <!-- Example 7: Select Dropdown -->
+    <div class="example" x-data="{ selectedColor: 'blue', colors: ['red', 'green', 'blue', 'yellow'] }">
+        <h3>7. Select Dropdown</h3>
+        <select x-model="selectedColor">
+            <template x-for="color in colors" :key="color">
+                <option :value="color" x-text="color"></option>
+            </template>
+        </select>
+        <div :style="'background: ' + selectedColor + '; padding: 20px; margin: 10px 0; border-radius: 4px;'">
+            <p style="color: white; text-shadow: 1px 1px 2px black;">Selected: <span x-text="selectedColor"></span></p>
+        </div>
+    </div>
+
+    <!-- Example 8: Simple Calculator -->
+    <div class="example" x-data="{ num1: 0, num2: 0, operation: '+' }">
+        <h3>8. Simple Calculator</h3>
+        <input type="number" x-model.number="num1">
+        <select x-model="operation">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">×</option>
+            <option value="/">÷</option>
+        </select>
+        <input type="number" x-model.number="num2">
+        <p>Result:
+            <span x-text="
+                operation == '+' ? num1 + num2 :
+                operation == '-' ? num1 - num2 :
+                operation == '*' ? num1 * num2 :
+                operation == '/' ? num1 / num2 : 0
+            "></span>
+        </p>
+    </div>
+
+    <!-- Example 9: Init Function -->
+    <div class="example" x-data="timer" x-init="init()">
+        <h3>9. Real-time Clock</h3>
+        <p>Current time: <span x-text="time"></span></p>
+    </div>
+
+    <script>
+        const timer = {
+            time: '',
+            updateTime() {
+                this.time = new Date().toLocaleTimeString()
+            },
+            init() {
+                this.updateTime();
+                setInterval(() => this.updateTime(), 1000)
+            }
+        }
+    </script>
+</body>
+
+</html>

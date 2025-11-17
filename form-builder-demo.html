@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimal Form Builder - Alpine.js Demo</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js CDN -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">
+        Minimal Form Builder
+      </h1>
+
+      <div x-data="formBuilder" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Form Builder Panel -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">
+            Build Your Form
+          </h2>
+
+          <!-- Fields List -->
+          <div class="space-y-4 mb-6">
+            <template x-for="(field, index) in fields" :key="field.id">
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="flex gap-3 mb-3">
+                  <input
+                    type="text"
+                    x-model="field.label"
+                    placeholder="Field Label"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <select
+                    x-model="field.type"
+                    class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="text">Text</option>
+                    <option value="email">Email</option>
+                    <option value="textarea">Textarea</option>
+                    <option value="tel">Phone</option>
+                    <option value="number">Number</option>
+                  </select>
+                </div>
+
+                <div class="flex items-center gap-4">
+                  <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <input
+                      type="checkbox"
+                      x-model="field.required"
+                      class="rounded"
+                    />
+                    Required
+                  </label>
+                  <input
+                    type="text"
+                    x-model="field.placeholder"
+                    placeholder="Placeholder text"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <button
+                    @click="removeField(index)"
+                    :disabled="field.locked"
+                    class="px-3 py-2 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- Add Field Button -->
+          <div class="text-center mb-6">
+            <button
+              @click="addField()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Add New Field
+            </button>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex gap-3 pt-4 border-t border-gray-200">
+            <button
+              @click="saveForm()"
+              class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              Save Form
+            </button>
+            <button
+              @click="resetForm()"
+              class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+            >
+              Reset to Default
+            </button>
+          </div>
+
+          <!-- Message -->
+          <div
+            x-show="message"
+            x-transition
+            class="mt-4 p-3 rounded-md"
+            :class="messageType === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+          >
+            <p x-text="message" class="text-sm"></p>
+          </div>
+        </div>
+
+        <!-- Form Preview Panel -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-xl font-semibold text-gray-800 mb-6 text-center">
+            Form Preview
+          </h3>
+
+          <div
+            class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-6"
+          >
+            <div class="bg-white rounded-lg p-6 shadow-sm">
+              <h4 class="text-lg font-medium text-gray-800 mb-6 text-center">
+                Contact Us
+              </h4>
+
+              <form class="space-y-4">
+                <template x-for="field in fields" :key="field.id">
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                      x-text="field.label + (field.required ? ' *' : '')"
+                    ></label>
+
+                    <input
+                      x-show="field.type !== 'textarea'"
+                      :type="field.type"
+                      :placeholder="field.placeholder"
+                      :required="field.required"
+                      disabled
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 cursor-not-allowed"
+                    />
+
+                    <textarea
+                      x-show="field.type === 'textarea'"
+                      :placeholder="field.placeholder"
+                      :required="field.required"
+                      rows="4"
+                      disabled
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 cursor-not-allowed resize-none"
+                    ></textarea>
+                  </div>
+                </template>
+
+                <div class="pt-2">
+                  <button
+                    type="button"
+                    disabled
+                    class="w-full px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed"
+                  >
+                    Send Message
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("formBuilder", () => ({
+          fields: [],
+          message: "",
+          messageType: "success",
+
+          init() {
+            this.fields = this.getDefaultFields();
+          },
+
+          getDefaultFields() {
+            return [
+              {
+                id: "name",
+                label: "Name",
+                type: "text",
+                required: true,
+                placeholder: "Enter your name",
+                locked: true,
+              },
+              {
+                id: "email",
+                label: "Email",
+                type: "email",
+                required: true,
+                placeholder: "Enter your email",
+                locked: true,
+              },
+              {
+                id: "message",
+                label: "Message",
+                type: "textarea",
+                required: true,
+                placeholder: "Enter your message",
+                locked: true,
+              },
+            ];
+          },
+
+          addField() {
+            const newField = {
+              id: "field_" + Date.now(),
+              label: "New Field",
+              type: "text",
+              required: false,
+              placeholder: "Enter text",
+              locked: false,
+            };
+            this.fields.push(newField);
+          },
+
+          removeField(index) {
+            if (!this.fields[index].locked) {
+              this.fields.splice(index, 1);
+            }
+          },
+
+          saveForm() {
+            this.message = "Form configuration saved successfully!";
+            this.messageType = "success";
+            setTimeout(() => (this.message = ""), 3000);
+          },
+
+          resetForm() {
+            if (
+              confirm(
+                "Are you sure you want to reset to default fields? This will remove all custom fields."
+              )
+            ) {
+              this.fields = this.getDefaultFields();
+              this.message = "Form has been reset to default fields.";
+              this.messageType = "success";
+              setTimeout(() => (this.message = ""), 3000);
+            }
+          },
+        }));
+      });
+    </script>
+  </body>
+</html>
