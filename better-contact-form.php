@@ -18,6 +18,7 @@ define('BCF_PLUGIN_PATH', plugin_dir_path(__FILE__));
 require_once BCF_PLUGIN_PATH . 'includes/class-bcf-post-type.php';
 require_once BCF_PLUGIN_PATH . 'includes/class-bcf-shortcode.php';
 require_once BCF_PLUGIN_PATH . 'includes/class-bcf-assets.php';
+require_once BCF_PLUGIN_PATH . 'includes/class-bcf-ajax.php';
 require_once BCF_PLUGIN_PATH . 'admin/class-bcf-admin.php';
 class BCF_Plugin
 {
@@ -32,6 +33,7 @@ class BCF_Plugin
           new BCF_Shortcode();
           new BCF_Assets();
           new BCF_Admin();
+          new BCF_Ajax();
      }
 }
 new BCF_Plugin();

@@ -58,8 +58,9 @@ class BCF_Admin
                                    <button type="button" @click="addField()" class="button button-primary">Add New Field</button>
                               </div>
                               <div class="bcf-form-actions">
-                                   <button type="button" class="button button-primary" @click="saveForm()">
-                                        Save Form
+                                   <button type="button" @click="saveForm()" class="button button-primary" :disabled="saving">
+                                        <span x-show="!saving">Save Form</span>
+                                        <span x-show="saving">Saving...</span>
                                    </button>
                                    <button type="button" class="button button-secondary" @click="resetForm()">Reset to Default</button>
                               </div>
@@ -95,6 +96,7 @@ class BCF_Admin
                document.addEventListener("alpine:init", () => {
                     Alpine.data("formBuilder", () => ({
                          fields: [],
+                         saving: false,
                          message: "",
                          messageType: "success",
                          init(savedFields) {

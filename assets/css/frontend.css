@@ -23,7 +23,6 @@
 .bcf-field {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
 }
 .bcf-field:last-child {
   margin-bottom: 0;

@@ -10,6 +10,11 @@ class BCF_Assets
      public function enqueue_frontend_assets()
      {
           wp_enqueue_style('bcf-frontend', BCF_PLUGIN_URL . 'assets/css/frontend.css', array(), '1.0.0');
+          wp_enqueue_script('bcf-frontend', BCF_PLUGIN_URL . 'assets/js/frontend.js', array('jquery'), '1.0.0', true);
+          wp_localize_script('bcf-frontend', 'bcf_ajax', array(
+               'ajax_url' => admin_url('admin-ajax.php'),
+               'nonce' => wp_create_nonce('bcf_submit_form')
+          ));
      }
 
      public function enqueue_admin_assets($hook)

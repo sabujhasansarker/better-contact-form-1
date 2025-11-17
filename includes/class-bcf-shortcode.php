@@ -19,7 +19,7 @@ class BCF_Shortcode
           <div class="bcf-container">
                <h3><?php echo esc_html($att['title']) ?></h3>
                <div id="bcf-messages"></div>
-               <form>
+               <form id="bcf-contact-form" class="bcf-form">
                     <?php foreach ($default_fields as $field): ?>
                          <div class="bcf-field">
                               <label for="bcf-<?php echo esc_attr($field['id']) ?>">
@@ -27,18 +27,9 @@ class BCF_Shortcode
                                    <?php if ($field['required']) : ?> * <?php endif ?>
                               </label>
                               <?php if ($field['type'] === 'textarea') : ?>
-                                   <textarea
-                                        id="bcf_<?php echo esc_attr($field['id']) ?> 
-                                        name=" bcf_<?php echo esc_attr($field['id']) ?>"
-                                        rows="5" <?php if ($field['required']): ?>required<?php endif; ?>
-                                        placeholder="<?php $field['placeholder'] ?>"></textarea>
+                                   <textarea id="bcf_<?php echo esc_attr($field['id']) ?>" name="bcf_<?php echo esc_attr($field['id']) ?>" rows="5" <?php if ($field['required']): ?>required<?php endif; ?> placeholder="<?php $field['placeholder'] ?>"></textarea>
                               <?php else : ?>
-                                   <input
-                                        id="bcf_<?php echo esc_attr($field['id']) ?> 
-                                        name=" bcf_<?php echo esc_attr($field['id']) ?>"
-                                        type="<?php $field['type'] ?>"
-                                        <?php if ($field['required']): ?>required<?php endif; ?>
-                                        placeholder="<?php $field['placeholder'] ?>">
+                                   <input id="bcf_<?php echo esc_attr($field['id']) ?>" name="bcf_<?php echo esc_attr($field['id']) ?>" type="<?php $field['type'] ?>" <?php if ($field['required']): ?>required<?php endif; ?> placeholder="<?php $field['placeholder'] ?>">
                               <?php endif ?>
                          </div>
                     <?php endforeach; ?>
