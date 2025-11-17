@@ -31,13 +31,13 @@ class BCF_Shortcode
                                         id="bcf_<?php echo esc_attr($field['id']) ?> 
                                         name=" bcf_<?php echo esc_attr($field['id']) ?>"
                                         rows="5" <?php if ($field['required']): ?>required<?php endif; ?>
-                                        placeholder="<?php $field['placeholder'] ?>">
-                                   </textarea>
+                                        placeholder="<?php $field['placeholder'] ?>"></textarea>
                               <?php else : ?>
                                    <input
                                         id="bcf_<?php echo esc_attr($field['id']) ?> 
                                         name=" bcf_<?php echo esc_attr($field['id']) ?>"
                                         type="<?php $field['type'] ?>"
+                                        <?php if ($field['required']): ?>required<?php endif; ?>
                                         placeholder="<?php $field['placeholder'] ?>">
                               <?php endif ?>
                          </div>
