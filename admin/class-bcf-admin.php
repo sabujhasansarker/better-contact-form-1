@@ -5,6 +5,7 @@ class BCF_Admin
      public function __construct()
      {
           add_action('admin_menu', array($this, 'add_admin_menu'));
+          add_action('wp_ajax_bcf_save_form_builder', array($this, 'save_form_builder'));
      }
 
      public function add_admin_menu()
@@ -20,7 +21,7 @@ class BCF_Admin
      }
      public function form_builder_page()
      {
-          $form_fields = $this->get_default_fields();
+          $form_fields = get_option('bcf_form_fields', $this->get_default_fields());
 ?>
           <div class="wrap" x-data="formBuilder" x-init="init(<?php echo esc_attr(json_encode($form_fields)); ?>)">
                <h1>Contact Form Builder</h1>
@@ -57,11 +58,14 @@ class BCF_Admin
                                    <button type="button" @click="addField()" class="button button-primary">Add New Field</button>
                               </div>
                               <div class="bcf-form-actions">
-                                   <button type="button" class="button button-primary">
+                                   <button type="button" class="button button-primary" @click="saveForm()">
                                         Save Form
                                    </button>
-                                   <button type="button" class="button button-secondary">Reset to Default</button>
+                                   <button type="button" class="button button-secondary" @click="resetForm()">Reset to Default</button>
                               </div>
+                         </div>
+                         <div x-show="message" class="notice" :class="messageType === 'success' ? 'notice-success' : 'notice-error'">
+                              <p x-text="message"></p>
                          </div>
                     </div>
 
@@ -93,11 +97,9 @@ class BCF_Admin
                          fields: [],
                          message: "",
                          messageType: "success",
-
-                         init() {
-                              this.fields = this.getDefaultFields();
+                         init(savedFields) {
+                              this.fields = savedFields && savedFields.length > 0 ? savedFields : this.getDefaultFields();
                          },
-
                          getDefaultFields() {
                               return [{
                                         id: "name",
@@ -141,10 +143,88 @@ class BCF_Admin
                               };
                               this.fields.push(newField);
                          },
+                         resetForm() {
+                              if (
+                                   confirm(
+                                        "Are you sure you want to reset to default fields? This will remove all custom fields."
+                                   )
+                              ) {
+                                   this.fields = this.getDefaultFields();
+                                   this.message = "Form has been reset to default fields.";
+                                   this.messageType = "success";
+                                   setTimeout(() => (this.message = ""), 3000);
+                              }
+                         },
+                         saveForm() {
+                              this.saving = true;
+                              this.message = '';
+
+                              fetch(ajaxurl, {
+                                        method: 'POST',
+                                        headers: {
+                                             'Content-Type': 'application/x-www-form-urlencoded',
+                                        },
+                                        body: new URLSearchParams({
+                                             action: 'bcf_save_form_builder',
+                                             nonce: '<?php echo wp_create_nonce("bcf_save_form"); ?>',
+                                             fields: JSON.stringify(this.fields)
+                                        })
+                                   })
+                                   .then(response => response.json())
+                                   .then(data => {
+                                        if (data.success) {
+                                             this.message = 'Form saved successfully!';
+                                             this.messageType = 'success';
+                                        } else {
+                                             this.message = data.data || 'Error saving form';
+                                             this.messageType = 'error';
+                                        }
+                                   })
+                                   .catch(error => {
+                                        this.message = 'Network error occurred';
+                                        this.messageType = 'error';
+                                   })
+                                   .finally(() => {
+                                        this.saving = false;
+                                        setTimeout(() => this.message = '', 3000);
+                                   });
+                         }
                     }));
                });
           </script>
 <?php
+     }
+     public function save_form_builder()
+     {
+          if (!wp_verify_nonce($_POST['nonce'], 'bcf_save_form')) {
+               wp_send_json_error('Security check failed');
+          }
+          if (!current_user_can('manage_options')) {
+               wp_send_json_error('Insufficient permissions');
+          }
+          $fields = json_decode(stripslashes($_POST['fields']), true);
+          if (!is_array($fields)) {
+               wp_send_json_error('Invalid field data');
+          }
+
+          $validated_fields = array();
+          foreach ($fields as $field) {
+               if (!isset($field['id'], $field['label'], $field['type'])) {
+                    continue;
+               }
+
+               $validated_fields[] = array(
+                    'id' => sanitize_text_field($field['id']),
+                    'label' => sanitize_text_field($field['label']),
+                    'type' => sanitize_text_field($field['type']),
+                    'required' => !empty($field['required']),
+                    'placeholder' => sanitize_text_field($field['placeholder'] ?? ''),
+                    'locked' => !empty($field['locked'])
+               );
+          }
+
+          update_option('bcf_form_fields', $validated_fields);
+          wp_send_json_success('Form saved successfully');
      }
      private function get_default_fields()
      {

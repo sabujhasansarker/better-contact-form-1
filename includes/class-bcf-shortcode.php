@@ -13,7 +13,7 @@ class BCF_Shortcode
                ),
                $atts
           );
-          $default_fields = $this->get_default_fields();
+          $default_fields = get_option('bcf_form_fields', $this->get_default_fields());
           ob_start();
 ?>
           <div class="bcf-container">
