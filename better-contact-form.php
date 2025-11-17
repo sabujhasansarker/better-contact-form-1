@@ -17,6 +17,7 @@ define('BCF_PLUGIN_PATH', plugin_dir_path(__FILE__));
 /** Initialize plugin */
 require_once BCF_PLUGIN_PATH . 'includes/class-bcf-post-type.php';
 require_once BCF_PLUGIN_PATH . 'includes/class-bcf-shortcode.php';
+require_once BCF_PLUGIN_PATH . 'includes/class-bcf-assets.php';
 class BCF_Plugin
 {
      public function __construct()
@@ -28,6 +29,7 @@ class BCF_Plugin
           $bcf = new BCF_Post_Type();
           $bcf->register_post_type();
           new BCF_Shortcode();
+          new BCF_Assets();
      }
 }
 new BCF_Plugin();
